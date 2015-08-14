@@ -66,7 +66,7 @@
 <% if queries.size > 0 %>
 <table class="table">
   <tr>
-    <th>Group</th><th>Query name</th><th>Targets</th><th></th><th>Query</th><th style="text-align:right;">Events</th><th></th><th></th><th></th>
+    <th>Group</th><th>Query name</th><th>Targets</th><th></th><th>Query</th><th style="text-align:right;">Events</th><th></th><th></th><th></th><th></th>
   </tr>
   <% queries.each_with_index do |query, index| %>
   <tr class="<%= query.suspended? ? "suspended" : "" %>">
@@ -141,6 +141,35 @@
           </div><!-- /.modal-dialog -->
         </div><!-- /.modal -->
       <% end %>
+    </td>
+    <td>
+      <a class="btn btn-info btn-xs" data-toggle="modal" href="#editQuery<%= index %>">
+        <span class="glyphicon glyphicon-edit"></span>
+      </a>
+      <div class="modal fade"
+           id="editQuery<%= index %>"
+           tabindex="-1" role="dialog" aria-labelledby="editQueryLabel<%= index %>" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title">Edit Query <%= query.name %></h4>          
+            </div>
+            <form action="<%= url_for("/replace") %>" method="POST">
+              <div class="modal-body">
+                <p>name: <%= query.name %>, group: <%= query.group || "(default)" %></p>
+                <input type="hidden" name="query_name" value="<%= query.name %>"/>
+                <input type="hidden" name="query_group" value="<%= query.group %>"/>
+                <textarea name="expression" id="addQueryExpression<%= index %>" class="form-control" rows="5"><%= query.expression %></textarea>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-warning">Submit</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </td>
     <td>
       <a class="btn btn-danger btn-xs" data-toggle="modal" href="#removeQuery<%= index %>">

@@ -131,7 +131,32 @@ class Norikra::WebUI::Handler < Sinatra::Base
       redirect url_for("/#queries")
     end
   end
+  
+  post '/replace' do
+    query_name,query_group,expression = params[:query_name], params[:query_group], params[:expression]
 
+    error_hook = lambda{ |error_class, error_message|
+      session[:input_data] = {
+        query_add: {
+          query_name: query_name, query_group: query_group, expression: expression,
+          error: error_message,
+        },
+      }
+      redirect url_for("/#query_add")
+    }
+
+    logging(:manage, :replace, [query_name, query_group, expression], on_error_hook: error_hook) do
+      if query_name.nil? || query_name.empty?
+        raise Norikra::ClientError, "Query name MUST NOT be blank"
+      end
+      if query_group.nil? || query_group.empty?
+        query_group = nil
+      end
+      engine.replace(Norikra::Query.new(name: query_name, group: query_group, expression: expression))
+      redirect url_for("/#queries")
+    end
+  end
+  
   post '/deregister' do
     query_name = params[:query_name]
     logging(:manage, :deregister, [query_name]) do
